@@ -62,7 +62,7 @@ export const createOrJoinSocket = (
     if (sharedWebSockets[url] === undefined) {
       sharedWebSockets[url] = optionsRef.current.eventSourceOptions ?
         new EventSource(url, optionsRef.current.eventSourceOptions) :
-        new WebSocket(url, optionsRef.current.protocols);
+        new WebSocket(url, optionsRef.current.protocols, optionsRef.current.headers);
       webSocketRef.current = sharedWebSockets[url];
       setReadyState(ReadyState.CONNECTING);
       clearSocketIoPingInterval = attachSharedListeners(
@@ -83,7 +83,7 @@ export const createOrJoinSocket = (
       reconnectCount,
       reconnect: startRef,
     };
-  
+
     addSubscriber(url, subscriber);
 
     return cleanSubscribers(
@@ -96,7 +96,7 @@ export const createOrJoinSocket = (
   } else {
     webSocketRef.current = optionsRef.current.eventSourceOptions ?
       new EventSource(url, optionsRef.current.eventSourceOptions) :
-      new WebSocket(url, optionsRef.current.protocols);
+      new WebSocket(url, optionsRef.current.protocols, optionsRef.current.headers);
     setReadyState(ReadyState.CONNECTING);
     if (!webSocketRef.current) {
       throw new Error('WebSocket failed to be created');

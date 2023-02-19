@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
-import { flushSync } from 'react-dom';
 import { DEFAULT_OPTIONS, isEventSourceSupported, ReadyState, UNPARSABLE_JSON_OBJECT } from './constants';
 import { createOrJoinSocket } from './create-or-join';
 import { getUrl } from './get-url';
@@ -31,7 +30,7 @@ export const useWebSocket = <T extends JsonValue | null = JsonValue | null>(
         return UNPARSABLE_JSON_OBJECT;
       }
     }
-    return null; 
+    return null;
   },[lastMessage]);
   const convertedUrl = useRef<string | null>(null);
   const webSocketRef = useRef<WebSocketLike | null>(null);
@@ -56,7 +55,7 @@ export const useWebSocket = <T extends JsonValue | null = JsonValue | null>(
       console.warn('Unable to send a message from an eventSource');
       return;
     }
-  
+
     if (webSocketRef.current?.readyState === ReadyState.OPEN) {
       assertIsWebSocket(webSocketRef.current, optionsCache.current.skipAssert);
       webSocketRef.current.send(message);
@@ -68,7 +67,7 @@ export const useWebSocket = <T extends JsonValue | null = JsonValue | null>(
   const sendJsonMessage: SendJsonMessage = useCallback((message, keep = true) => {
     sendMessage(JSON.stringify(message), keep);
   }, [sendMessage]);
-  
+
   const getWebSocket = useCallback(() => {
     if (optionsCache.current.share !== true || (isEventSourceSupported && webSocketRef.current instanceof EventSource)) {
       return webSocketRef.current;
@@ -93,16 +92,11 @@ export const useWebSocket = <T extends JsonValue | null = JsonValue | null>(
 
         const protectedSetLastMessage = (message: WebSocketEventMap['message']) => {
           if (!expectClose) {
-            flushSync(() => setLastMessage(message));
           }
         };
-  
+
         const protectedSetReadyState = (state: ReadyState) => {
           if (!expectClose) {
-            flushSync(() => setReadyState(prev => ({
-              ...prev,
-              ...(convertedUrl.current && {[convertedUrl.current]: state}),
-            })));
           }
         };
 
@@ -127,7 +121,7 @@ export const useWebSocket = <T extends JsonValue | null = JsonValue | null>(
           start();
         }
       };
-    
+
       start();
       return () => {
         expectClose = true;
